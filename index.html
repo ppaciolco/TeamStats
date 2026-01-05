@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Classic Ragnarok Stats</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  body {
+    background-color: #2b1d12;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #f5e6c8;
+    padding: 20px;
+  }
+
+  .window {
+    width: 620px;
+    margin: auto;
+    background-color: #3b2716;
+    border: 3px solid #c9a24d;
+    padding: 15px;
+  }
+
+  .title {
+    text-align: center;
+    font-weight: bold;
+    color: #f5d98b;
+    margin-bottom: 10px;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .content {
+    display: table;
+    width: 100%;
+  }
+
+  .stats, .chart {
+    display: table-cell;
+    vertical-align: top;
+  }
+
+  .stats {
+    width: 300px;
+  }
+
+  .stat {
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .value {
+    display: inline-block;
+    width: 30px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    width: 150px;
+    vertical-align: middle;
+  }
+
+  canvas {
+    background-color: #1a120b;
+    border: 2px solid #c9a24d;
+  }
+
+  select {
+    background: #1a120b;
+    color: #f5e6c8;
+    border: 1px solid #c9a24d;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="window">
+  <div class="title">Character Status</div>
+
+  <div class="topbar">
+    <div>
+      Job:
+      <select id="job">
+        <option value="">Custom</option>
+        <option value="admin">Admin</option>
+        <option value="junior">Junior Engineer</option>
+        <option value="engineer">Engineer</option>
+        <option value="senior">Senior</option>
+      </select>
+    </div>
+    <div>
+      Remaining Points: <span id="remaining">100</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats">
+      <div class="stat">STR <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">AGI <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">VIT <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">INT <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">DEX <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">LUK <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    </div>
+
+    <div class="chart">
+      <canvas id="radar" width="260" height="260"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  var TOTAL_POINTS = 100;
+
+  var presets = {
+    admin:    [20,20,20,20,10,10], // total 100
+    junior:   [15,15,15,20,25,10], // total 100
+    engineer: [15,20,20,25,15,5],  // total 100
+    senior:   [10,20,25,30,10,5]   // total 100
+  };
+
+  var sliders = document.getElementsByTagName("input");
+  var values = document.getElementsByClassName("value");
+  var remainingEl = document.getElementById("remaining");
+  var jobSelect = document.getElementById("job");
+
+  var chart = new Chart(document.getElementById("radar"), {
+    type: "radar",
+    data: {
+      labels: ["STR","AGI","VIT","INT","DEX","LUK"],
+      datasets: [{
+        data: [5,5,5,5,5,5],
+        fill: true,
+        backgroundColor: "rgba(201,162,77,0.35)",
+        borderColor: "#f5d98b",
+        pointBackgroundColor: "#f5d98b",
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0,
+          max: 50,
+          ticks: { stepSize: 5, display: false },
+          grid: { color: "#6b4e1e" },
+          angleLines: { color: "#6b4e1e" },
+          pointLabels: { color: "#f5e6c8", font: { size: 11 } }
+        }
+      }
+    }
+  });
+
+  function updateRemaining() {
+    var sum = 0;
+    for (var i = 0; i < sliders.length; i++) {
+      sum += parseInt(sliders[i].value);
+    }
+    remainingEl.innerHTML = TOTAL_POINTS - sum;
+    return TOTAL_POINTS - sum;
+  }
+
+  function updateChart() {
+    for (var i = 0; i < sliders.length; i++) {
+      values[i].innerHTML = sliders[i].value;
+      chart.data.datasets[0].data[i] = sliders[i].value;
+    }
+    chart.update();
+  }
+
+  for (let i = 0; i < sliders.length; i++) {
+    sliders[i].oninput = function () {
+      var before = updateRemaining();
+      if (before < 0) {
+        this.value--;
+      }
+      updateRemaining();
+      updateChart();
+      jobSelect.value = "";
+    };
+  }
+
+  jobSelect.onchange = function () {
+    var preset = presets[this.value];
+    if (!preset) return;
+
+    for (var i = 0; i < sliders.length; i++) {
+      sliders[i].value = preset[i];
+    }
+    updateRemaining();
+    updateChart();
+  };
+
+  updateRemaining();
+</script>
+
+</body>
+</html>
