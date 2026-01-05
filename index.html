@@ -2,205 +2,242 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Classic Ragnarok Stats</title>
-
+<title>Custom Stats Character Creation</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  body {
-    background-color: #2b1d12;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #f5e6c8;
-    padding: 20px;
-  }
-
-  .window {
-    width: 620px;
-    margin: auto;
-    background-color: #3b2716;
-    border: 3px solid #c9a24d;
-    padding: 15px;
-  }
-
-  .title {
-    text-align: center;
-    font-weight: bold;
-    color: #f5d98b;
-    margin-bottom: 10px;
-  }
-
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 13px;
-  }
-
-  .content {
-    display: table;
-    width: 100%;
-  }
-
-  .stats, .chart {
-    display: table-cell;
-    vertical-align: top;
-  }
-
-  .stats {
-    width: 300px;
-  }
-
-  .stat {
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-
-  .value {
-    display: inline-block;
-    width: 30px;
-    text-align: right;
-  }
-
-  input[type=range] {
-    width: 150px;
-    vertical-align: middle;
-  }
-
-  canvas {
-    background-color: #1a120b;
-    border: 2px solid #c9a24d;
-  }
-
-  select {
-    background: #1a120b;
-    color: #f5e6c8;
-    border: 1px solid #c9a24d;
-  }
+body {
+  background-color: #f2e8d5;
+  font-family: 'Press Start 2P', cursive;
+  color: #3b2716;
+  padding: 20px;
+}
+.window {
+  width: 680px;
+  margin: auto;
+  background-image: linear-gradient(#fdf5e6,#f5eddc);
+  border: 4px solid #c9a24d;
+  padding: 15px;
+  box-shadow: 4px 4px 0 #6b4e1e;
+}
+.title {
+  text-align: center;
+  font-weight: bold;
+  color: #c68e3f;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+input[type=text], select {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  padding: 2px;
+}
+.content {
+  display: table;
+  width: 100%;
+}
+.stats, .chart {
+  display: table-cell;
+  vertical-align: top;
+}
+.stats {
+  width: 360px;
+}
+.stat {
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+.value {
+  display: inline-block;
+  width: 28px;
+  text-align: right;
+}
+input[type=range] {
+  width: 160px;
+  vertical-align: middle;
+}
+canvas {
+  background-color: #fdf5e6;
+  border: 2px solid #c9a24d;
+}
+.btn {
+  margin-top: 10px;
+  padding: 4px 8px;
+  background: #c9a24d;
+  border: 1px solid #6b4e1e;
+  color: #1a120b;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+}
+.summary {
+  margin-top: 10px;
+  font-size: 11px;
+  background: #fdf5e6;
+  padding: 8px;
+  border: 2px solid #c9a24d;
+  white-space: pre-line;
+}
 </style>
 </head>
-
 <body>
-
 <div class="window">
-  <div class="title">Character Status</div>
-
+  <div class="title">Character Creation</div>
+  
   <div class="topbar">
-    <div>
-      Job:
+    <div>Name: <input type="text" id="charName" placeholder="Enter name"></div>
+    <div>Job: 
       <select id="job">
-        <option value="">Custom</option>
-        <option value="admin">Admin</option>
-        <option value="junior">Junior Engineer</option>
-        <option value="engineer">Engineer</option>
-        <option value="senior">Senior</option>
+        <option value="Custom">Custom</option>
+        <option value="Admin">Admin</option>
+        <option value="Junior Engineer">Junior Engineer</option>
+        <option value="Engineer">Engineer</option>
+        <option value="Senior">Senior</option>
       </select>
     </div>
-    <div>
-      Remaining Points: <span id="remaining">100</span>
+  </div>
+  
+  <div class="topbar">
+    <div>Appearance: 
+      <select id="appearance">
+        <option value="Default">Default</option>
+        <option value="Hair1">Hair1</option>
+        <option value="Hair2">Hair2</option>
+        <option value="Hair3">Hair3</option>
+      </select>
     </div>
   </div>
 
-  <div class="content">
-    <div class="stats">
-      <div class="stat">STR <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-      <div class="stat">AGI <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-      <div class="stat">VIT <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-      <div class="stat">INT <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-      <div class="stat">DEX <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-      <div class="stat">LUK <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    </div>
+  <div class="stats">
+    <div class="stat">Stat 1 Name: <input type="text" class="statName" value="Cx Reg"></div>
+    <div class="stat">Stat 2 Name: <input type="text" class="statName" value="2-way"></div>
+    <div class="stat">Stat 3 Name: <input type="text" class="statName" value="WhatsApp"></div>
+    <div class="stat">Stat 4 Name: <input type="text" class="statName" value="Acc Setup"></div>
+    <div class="stat">Stat 5 Name: <input type="text" class="statName" value="Voice"></div>
+    <div class="stat">Stat 6 Name: <input type="text" class="statName" value="LINE"></div>
+    
+    <div class="stat">Values:</div>
+    <div class="stat">1: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    <div class="stat">2: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    <div class="stat">3: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    <div class="stat">4: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    <div class="stat">5: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+    <div class="stat">6: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
 
-    <div class="chart">
-      <canvas id="radar" width="260" height="260"></canvas>
-    </div>
+    <button class="btn" id="createBtn">Create Character</button>
+    <button class="btn" id="resetBtn">Reset</button>
+    <button class="btn" id="randomBtn">Randomize</button>
+  </div>
+
+  <div class="chart">
+    <canvas id="radar" width="260" height="260"></canvas>
+    <div class="summary" id="summary"></div>
   </div>
 </div>
 
 <script>
-  var TOTAL_POINTS = 100;
+var TOTAL_POINTS = 100;
+var sliders = document.querySelectorAll(".stats input[type=range]");
+var values = document.getElementsByClassName("value");
+var statNames = document.getElementsByClassName("statName");
+var summaryEl = document.getElementById("summary");
 
-  var presets = {
-    admin:    [20,20,20,20,10,10], // total 100
-    junior:   [15,15,15,20,25,10], // total 100
-    engineer: [15,20,20,25,15,5],  // total 100
-    senior:   [10,20,25,30,10,5]   // total 100
-  };
-
-  var sliders = document.getElementsByTagName("input");
-  var values = document.getElementsByClassName("value");
-  var remainingEl = document.getElementById("remaining");
-  var jobSelect = document.getElementById("job");
-
-  var chart = new Chart(document.getElementById("radar"), {
-    type: "radar",
-    data: {
-      labels: ["STR","AGI","VIT","INT","DEX","LUK"],
-      datasets: [{
-        data: [5,5,5,5,5,5],
-        fill: true,
-        backgroundColor: "rgba(201,162,77,0.35)",
-        borderColor: "#f5d98b",
-        pointBackgroundColor: "#f5d98b",
-        borderWidth: 2
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        r: {
-          min: 0,
-          max: 50,
-          ticks: { stepSize: 5, display: false },
-          grid: { color: "#6b4e1e" },
-          angleLines: { color: "#6b4e1e" },
-          pointLabels: { color: "#f5e6c8", font: { size: 11 } }
-        }
+// Create Chart
+var chart = new Chart(document.getElementById("radar"), {
+  type: "radar",
+  data: {
+    labels: Array.from(statNames).map(n => n.value),
+    datasets: [{
+      data: Array.from(sliders).map(s => s.value),
+      fill: true,
+      backgroundColor: "rgba(201,162,77,0.35)",
+      borderColor: "#c68e3f",
+      pointBackgroundColor: "#c68e3f",
+      borderWidth: 2
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 0,
+        max: 50,
+        ticks: { stepSize: 5, display: false },
+        grid: { color: "#c9a24d" },
+        angleLines: { color: "#c9a24d" },
+        pointLabels: { color: "#3b2716", font: { size: 11 } }
       }
     }
+  }
+});
+
+// RO-style increasing stat cost
+function statCost(value){
+  if(value<=10) return value;
+  if(value<=20) return 10+(value-10)*2;
+  if(value<=30) return 30+(value-20)*3;
+  return 60+(value-30)*4;
+}
+
+function totalCost(){
+  return Array.from(sliders).reduce((sum,s) => sum+statCost(parseInt(s.value)),0);
+}
+
+function updateChart(){
+  chart.data.labels = Array.from(statNames).map(n => n.value);
+  chart.data.datasets[0].data = Array.from(sliders).map(s => s.value);
+  Array.from(sliders).forEach((s,i) => values[i].innerHTML = s.value);
+  chart.update();
+}
+
+function enforceTotal(){
+  while(totalCost() > TOTAL_POINTS){
+    let idx = Math.floor(Math.random()*sliders.length);
+    if(sliders[idx].value>1) sliders[idx].value--;
+  }
+  updateChart();
+}
+
+Array.from(sliders).forEach(s => s.oninput = enforceTotal);
+Array.from(statNames).forEach(n => n.oninput = updateChart);
+
+document.getElementById("createBtn").onclick = function(){
+  let name = document.getElementById("charName").value || "Unnamed";
+  let appearance = document.getElementById("appearance").value;
+  let job = document.getElementById("job").value || "Custom";
+  let stats = Array.from(sliders).map(s => s.value);
+  let cost = stats.map(statCost);
+  let total = cost.reduce((a,b)=>a+b,0);
+  let names = Array.from(statNames).map(n=>n.value);
+  summaryEl.innerText = 
+    "Name: "+name+
+    "\nJob: "+job+
+    "\nAppearance: "+appearance+
+    "\nStats:\n"+names.map((n,i)=>n+": "+stats[i]).join("\n")+
+    "\nPoints Used: "+total+" / "+TOTAL_POINTS;
+};
+
+document.getElementById("resetBtn").onclick = function(){
+  Array.from(sliders).forEach(s => s.value=5);
+  Array.from(statNames).forEach((n,i) => {
+    n.value = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"][i];
   });
+  enforceTotal();
+};
 
-  function updateRemaining() {
-    var sum = 0;
-    for (var i = 0; i < sliders.length; i++) {
-      sum += parseInt(sliders[i].value);
-    }
-    remainingEl.innerHTML = TOTAL_POINTS - sum;
-    return TOTAL_POINTS - sum;
-  }
+document.getElementById("randomBtn").onclick = function(){
+  Array.from(sliders).forEach(s => s.value = Math.floor(Math.random()*50)+1);
+  enforceTotal();
+};
 
-  function updateChart() {
-    for (var i = 0; i < sliders.length; i++) {
-      values[i].innerHTML = sliders[i].value;
-      chart.data.datasets[0].data[i] = sliders[i].value;
-    }
-    chart.update();
-  }
-
-  for (let i = 0; i < sliders.length; i++) {
-    sliders[i].oninput = function () {
-      var before = updateRemaining();
-      if (before < 0) {
-        this.value--;
-      }
-      updateRemaining();
-      updateChart();
-      jobSelect.value = "";
-    };
-  }
-
-  jobSelect.onchange = function () {
-    var preset = presets[this.value];
-    if (!preset) return;
-
-    for (var i = 0; i < sliders.length; i++) {
-      sliders[i].value = preset[i];
-    }
-    updateRemaining();
-    updateChart();
-  };
-
-  updateRemaining();
+enforceTotal();
 </script>
-
 </body>
 </html>
