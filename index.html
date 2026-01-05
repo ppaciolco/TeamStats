@@ -1,96 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Custom Stats Character Creation</title>
+<title>Modern Ragnarok Character Creation</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 body {
-  background-color: #f2e8d5;
+  background-color: #e2edf5;
   font-family: 'Press Start 2P', cursive;
-  color: #3b2716;
+  color: #1b263b;
   padding: 20px;
 }
+
 .window {
-  width: 680px;
+  width: 750px;
   margin: auto;
-  background-image: linear-gradient(#fdf5e6,#f5eddc);
-  border: 4px solid #c9a24d;
-  padding: 15px;
-  box-shadow: 4px 4px 0 #6b4e1e;
+  background: linear-gradient(145deg, #c9d6e3, #f0f5fa);
+  border-radius: 12px;
+  border: 2px solid #5a6b8b;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.25);
+  padding: 20px;
 }
+
 .title {
   text-align: center;
   font-weight: bold;
-  color: #c68e3f;
-  margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 16px;
+  color: #3b4f6b;
+  margin-bottom: 15px;
 }
+
 .topbar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 11px;
+  margin-bottom: 15px;
+  font-size: 12px;
 }
+
 input[type=text], select {
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
-  padding: 2px;
+  padding: 3px;
+  border-radius: 4px;
+  border: 1px solid #5a6b8b;
+  background-color: #f0f5fa;
 }
+
 .content {
-  display: table;
-  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
-.stats, .chart {
-  display: table-cell;
-  vertical-align: top;
-}
+
 .stats {
   width: 360px;
+  background: #d3e0f0;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1);
 }
+
 .stat {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 11px;
 }
-.value {
-  display: inline-block;
-  width: 28px;
-  text-align: right;
-}
+
 input[type=range] {
-  width: 160px;
+  width: 180px;
   vertical-align: middle;
 }
-canvas {
-  background-color: #fdf5e6;
-  border: 2px solid #c9a24d;
+
+.value {
+  display: inline-block;
+  width: 30px;
+  text-align: right;
 }
+
+.chart {
+  width: 360px;
+  text-align: center;
+}
+
 .btn {
-  margin-top: 10px;
-  padding: 4px 8px;
-  background: #c9a24d;
-  border: 1px solid #6b4e1e;
-  color: #1a120b;
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #5a6b8b;
+  border: none;
+  border-radius: 6px;
+  color: #f0f5fa;
   cursor: pointer;
   font-weight: bold;
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
+  margin-right: 5px;
 }
+.btn:hover {
+  background: #3b4f6b;
+}
+
 .summary {
-  margin-top: 10px;
+  margin-top: 15px;
+  width: 100%;
+  border-collapse: collapse;
   font-size: 11px;
-  background: #fdf5e6;
-  padding: 8px;
-  border: 2px solid #c9a24d;
-  white-space: pre-line;
+}
+.summary th, .summary td {
+  border: 1px solid #5a6b8b;
+  padding: 6px 8px;
+  text-align: center;
+  background: #f0f5fa;
+}
+.summary th {
+  background: #5a6b8b;
+  color: #f0f5fa;
 }
 </style>
 </head>
 <body>
+
 <div class="window">
-  <div class="title">Character Creation</div>
-  
+  <div class="title">Ragnarok Character Creation</div>
+
   <div class="topbar">
     <div>Name: <input type="text" id="charName" placeholder="Enter name"></div>
     <div>Job: 
@@ -103,53 +133,59 @@ canvas {
       </select>
     </div>
   </div>
-  
-  <div class="topbar">
-    <div>Appearance: 
-      <select id="appearance">
-        <option value="Default">Default</option>
-        <option value="Hair1">Hair1</option>
-        <option value="Hair2">Hair2</option>
-        <option value="Hair3">Hair3</option>
-      </select>
+
+  <div class="content">
+    <!-- STATS PANEL -->
+    <div class="stats">
+      <div class="stat">Stat 1 Name: <input type="text" class="statName" value="Cx Reg"></div>
+      <div class="stat">Stat 2 Name: <input type="text" class="statName" value="2-way"></div>
+      <div class="stat">Stat 3 Name: <input type="text" class="statName" value="WhatsApp"></div>
+      <div class="stat">Stat 4 Name: <input type="text" class="statName" value="Acc Setup"></div>
+      <div class="stat">Stat 5 Name: <input type="text" class="statName" value="Voice"></div>
+      <div class="stat">Stat 6 Name: <input type="text" class="statName" value="LINE"></div>
+
+      <div class="stat">Values:</div>
+      <div class="stat">1: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">2: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">3: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">4: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">5: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+      <div class="stat">6: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
+
+      <button class="btn" id="resetBtn">Reset</button>
+      <button class="btn" id="randomBtn">Randomize</button>
     </div>
-  </div>
 
-  <div class="stats">
-    <div class="stat">Stat 1 Name: <input type="text" class="statName" value="Cx Reg"></div>
-    <div class="stat">Stat 2 Name: <input type="text" class="statName" value="2-way"></div>
-    <div class="stat">Stat 3 Name: <input type="text" class="statName" value="WhatsApp"></div>
-    <div class="stat">Stat 4 Name: <input type="text" class="statName" value="Acc Setup"></div>
-    <div class="stat">Stat 5 Name: <input type="text" class="statName" value="Voice"></div>
-    <div class="stat">Stat 6 Name: <input type="text" class="statName" value="LINE"></div>
-    
-    <div class="stat">Values:</div>
-    <div class="stat">1: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    <div class="stat">2: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    <div class="stat">3: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    <div class="stat">4: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    <div class="stat">5: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-    <div class="stat">6: <input type="range" min="1" max="50" value="5"><span class="value">5</span></div>
-
-    <button class="btn" id="createBtn">Create Character</button>
-    <button class="btn" id="resetBtn">Reset</button>
-    <button class="btn" id="randomBtn">Randomize</button>
-  </div>
-
-  <div class="chart">
-    <canvas id="radar" width="260" height="260"></canvas>
-    <div class="summary" id="summary"></div>
+    <!-- RADAR PANEL -->
+    <div class="chart">
+      <canvas id="radar" width="360" height="360"></canvas>
+      <table class="summary" id="summaryTable">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Cx Reg</td><td>5</td></tr>
+          <tr><td>2-way</td><td>5</td></tr>
+          <tr><td>WhatsApp</td><td>5</td></tr>
+          <tr><td>Acc Setup</td><td>5</td></tr>
+          <tr><td>Voice</td><td>5</td></tr>
+          <tr><td>LINE</td><td>5</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script>
-var TOTAL_POINTS = 100;
 var sliders = document.querySelectorAll(".stats input[type=range]");
 var values = document.getElementsByClassName("value");
 var statNames = document.getElementsByClassName("statName");
-var summaryEl = document.getElementById("summary");
+var summaryTable = document.getElementById("summaryTable").querySelector("tbody");
 
-// Create Chart
+// Chart
 var chart = new Chart(document.getElementById("radar"), {
   type: "radar",
   data: {
@@ -157,9 +193,9 @@ var chart = new Chart(document.getElementById("radar"), {
     datasets: [{
       data: Array.from(sliders).map(s => s.value),
       fill: true,
-      backgroundColor: "rgba(201,162,77,0.35)",
-      borderColor: "#c68e3f",
-      pointBackgroundColor: "#c68e3f",
+      backgroundColor: "rgba(90,107,139,0.35)",
+      borderColor: "#3b4f6b",
+      pointBackgroundColor: "#3b4f6b",
       borderWidth: 2
     }]
   },
@@ -170,74 +206,47 @@ var chart = new Chart(document.getElementById("radar"), {
         min: 0,
         max: 50,
         ticks: { stepSize: 5, display: false },
-        grid: { color: "#c9a24d" },
-        angleLines: { color: "#c9a24d" },
-        pointLabels: { color: "#3b2716", font: { size: 11 } }
+        grid: { color: "#5a6b8b" },
+        angleLines: { color: "#5a6b8b" },
+        pointLabels: { color: "#1b263b", font: { size: 11 } }
       }
     }
   }
 });
 
-// RO-style increasing stat cost
-function statCost(value){
-  if(value<=10) return value;
-  if(value<=20) return 10+(value-10)*2;
-  if(value<=30) return 30+(value-20)*3;
-  return 60+(value-30)*4;
-}
-
-function totalCost(){
-  return Array.from(sliders).reduce((sum,s) => sum+statCost(parseInt(s.value)),0);
-}
-
+// Update functions
 function updateChart(){
-  chart.data.labels = Array.from(statNames).map(n => n.value);
-  chart.data.datasets[0].data = Array.from(sliders).map(s => s.value);
-  Array.from(sliders).forEach((s,i) => values[i].innerHTML = s.value);
+  chart.data.labels = Array.from(statNames).map(n=>n.value);
+  chart.data.datasets[0].data = Array.from(sliders).map(s=>s.value);
+  Array.from(sliders).forEach((s,i)=>values[i].innerHTML = s.value);
   chart.update();
+  updateSummary();
 }
 
-function enforceTotal(){
-  while(totalCost() > TOTAL_POINTS){
-    let idx = Math.floor(Math.random()*sliders.length);
-    if(sliders[idx].value>1) sliders[idx].value--;
-  }
-  updateChart();
+function updateSummary(){
+  Array.from(summaryTable.rows).forEach((row,i)=>{
+    row.cells[0].innerText = statNames[i].value;
+    row.cells[1].innerText = sliders[i].value;
+  });
 }
 
-Array.from(sliders).forEach(s => s.oninput = enforceTotal);
-Array.from(statNames).forEach(n => n.oninput = updateChart);
-
-document.getElementById("createBtn").onclick = function(){
-  let name = document.getElementById("charName").value || "Unnamed";
-  let appearance = document.getElementById("appearance").value;
-  let job = document.getElementById("job").value || "Custom";
-  let stats = Array.from(sliders).map(s => s.value);
-  let cost = stats.map(statCost);
-  let total = cost.reduce((a,b)=>a+b,0);
-  let names = Array.from(statNames).map(n=>n.value);
-  summaryEl.innerText = 
-    "Name: "+name+
-    "\nJob: "+job+
-    "\nAppearance: "+appearance+
-    "\nStats:\n"+names.map((n,i)=>n+": "+stats[i]).join("\n")+
-    "\nPoints Used: "+total+" / "+TOTAL_POINTS;
-};
+// Event listeners
+Array.from(sliders).forEach(s=>s.oninput=updateChart);
+Array.from(statNames).forEach(n=>n.oninput=updateChart);
 
 document.getElementById("resetBtn").onclick = function(){
-  Array.from(sliders).forEach(s => s.value=5);
-  Array.from(statNames).forEach((n,i) => {
-    n.value = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"][i];
-  });
-  enforceTotal();
+  Array.from(sliders).forEach(s=>s.value=5);
+  Array.from(statNames).forEach((n,i)=>n.value=["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"][i]);
+  updateChart();
 };
 
 document.getElementById("randomBtn").onclick = function(){
-  Array.from(sliders).forEach(s => s.value = Math.floor(Math.random()*50)+1);
-  enforceTotal();
+  Array.from(sliders).forEach(s=>s.value=Math.floor(Math.random()*50)+1);
+  updateChart();
 };
 
-enforceTotal();
+// Initial render
+updateChart();
 </script>
 </body>
 </html>
