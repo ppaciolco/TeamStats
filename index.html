@@ -147,6 +147,7 @@ const statsPanel = document.getElementById("statsPanel");
 
 let sliders = [];
 let statInputs = [];
+let top3Labels = [];
 
 /* Create stat rows */
 statNamesList.forEach(name => {
@@ -190,6 +191,10 @@ const chart = new Chart(document.getElementById("radar"), {
     }]
   },
   options: {
+    animation: {
+      duration: 500,
+      easing: "easeInOutQuart"
+    },
     plugins: { legend: { display: false } },
     scales: {
       r: {
@@ -199,8 +204,11 @@ const chart = new Chart(document.getElementById("radar"), {
         grid: { color: "#5a6b8b" },
         angleLines: { color: "#5a6b8b" },
         pointLabels: {
-          color: "#1b263b",
-          font: { size: 11 }
+          font: { size: 11 },
+          color: ctx =>
+            top3Labels.includes(ctx.label)
+              ? "#f4d35e"
+              : "#1b263b"
         }
       }
     }
@@ -216,6 +224,8 @@ function updateChart() {
   }));
 
   data.sort((a, b) => b.value - a.value);
+
+  top3Labels = data.slice(0, 3).map(d => d.name);
 
   const pointRadius = [];
   const pointBg = [];
