@@ -30,6 +30,23 @@ body {
   font-size: 16px;
   color: #3b4f6b;
   margin-bottom: 15px;
+  text-shadow: 1px 1px #fff;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+input[type=text], select {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 2px solid #5a6b8b;
+  background-color: #e0edf7;
 }
 
 .content {
@@ -42,6 +59,7 @@ body {
   background: #d3e0f0;
   border-radius: 10px;
   padding: 15px;
+  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.15);
 }
 
 .stat-row {
@@ -67,9 +85,29 @@ body {
 
 .chart {
   width: 380px;
+  text-align: center;
   background: #dfe9f4;
+  border: 2px solid #5a6b8b;
   border-radius: 10px;
   padding: 10px;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1);
+}
+
+.btn {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background: #5a6b8b;
+  border: 2px solid #3b4f6b;
+  border-radius: 6px;
+  color: #f0f5fa;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  margin-right: 5px;
+}
+
+.btn:hover {
+  background: #3b4f6b;
 }
 </style>
 </head>
@@ -78,6 +116,19 @@ body {
 
 <div class="window">
   <div class="title">Engineer Stats</div>
+
+  <div class="topbar">
+    <div>Name: <input type="text" placeholder="Enter name"></div>
+    <div>Job:
+      <select>
+        <option>Custom</option>
+        <option>Admin</option>
+        <option>Junior Engineer</option>
+        <option>Engineer</option>
+        <option>Senior</option>
+      </select>
+    </div>
+  </div>
 
   <div class="content">
     <div class="stats" id="statsPanel"></div>
@@ -88,19 +139,20 @@ body {
 </div>
 
 <script>
-const statNames = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"];
+const statNamesList = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"];
 const statsPanel = document.getElementById("statsPanel");
 
 let sliders = [];
-let nameInputs = [];
+let statInputs = [];
 let top3Names = [];
 
-// Build sliders
-statNames.forEach(name => {
+// Build stat rows
+statNamesList.forEach(name => {
   const row = document.createElement("div");
   row.className = "stat-row";
 
   const input = document.createElement("input");
+  input.type = "text";
   input.className = "statName";
   input.value = name;
 
@@ -109,6 +161,7 @@ statNames.forEach(name => {
   slider.min = 0;
   slider.max = 100;
   slider.step = 5;
+  slider.value = 0;
 
   const value = document.createElement("span");
   value.className = "value";
@@ -118,11 +171,11 @@ statNames.forEach(name => {
   statsPanel.appendChild(row);
 
   sliders.push(slider);
-  nameInputs.push(input);
+  statInputs.push(input);
 });
 
 // Radar chart
-const chart = new Chart(document.getElementById("radar"), {
+const radarChart = new Chart(document.getElementById("radar"), {
   type: "radar",
   data: {
     labels: [],
@@ -134,11 +187,15 @@ const chart = new Chart(document.getElementById("radar"), {
       borderWidth: 2,
       pointRadius: [],
       pointBackgroundColor: [],
+      pointBorderColor: [],
       pointStyle: []
     }]
   },
   options: {
-    animation: { duration: 600, easing: "easeInOutQuart" },
+    animation: {
+      duration: 600,
+      easing: "easeInOutQuart"
+    },
     plugins: { legend: { display: false } },
     scales: {
       r: {
@@ -149,55 +206,101 @@ const chart = new Chart(document.getElementById("radar"), {
         angleLines: { color: "#5a6b8b" },
         pointLabels: {
           font: ctx => ({
-            size: top3Names.includes(ctx.label.replace("★ ","")) ? 13 : 11,
-            weight: top3Names.includes(ctx.label.replace("★ ","")) ? "bold" : "normal"
+            size: top3Names.includes(ctx.raw) ? 13 : 11,
+            weight: top3Names.includes(ctx.raw) ? "bold" : "normal"
           }),
           color: ctx =>
-            top3Names.includes(ctx.label.replace("★ ",""))
-              ? "#FFD700"
-              : "#1b263b"
+            top3Names.includes(ctx.raw) ? "#FFD700" : "#1b263b"
         }
       }
     }
-  }
+  },
+  plugins: [{
+    id: "goldGlow",
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(0);
+      meta.data.forEach((point, i) => {
+        if (i < 3) {
+          const pulse = Math.sin(Date.now() / 400) * 2 + 3;
+          ctx.save();
+          ctx.shadowBlur = pulse * 3;
+          ctx.shadowColor = "#FFD700";
+          ctx.beginPath();
+          ctx.arc(point.x, point.y,
+            chart.data.datasets[0].pointRadius[i],
+            0, Math.PI * 2);
+          ctx.fillStyle = chart.data.datasets[0].pointBackgroundColor[i];
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+  }]
 });
 
 // Update logic
 function updateChart() {
-  const stats = nameInputs.map((input, i) => ({
+  const data = statInputs.map((input, i) => ({
     name: input.value,
     value: Number(sliders[i].value)
   }));
 
-  const sorted = [...stats].sort((a,b)=>b.value-a.value);
-  top3Names = sorted.slice(0,3).map(s=>s.name);
+  data.sort((a, b) => b.value - a.value);
+  top3Names = data.slice(0, 3).map(d => d.name);
 
-  chart.data.labels = stats.map(s =>
-    top3Names.includes(s.name) ? `★ ${s.name}` : s.name
+  radarChart.data.labels = data.map((d, i) =>
+    i < 3 ? `★ ${d.name}` : d.name
   );
 
-  chart.data.datasets[0].data = stats.map(s => s.value);
+  const radius = [], bg = [], border = [], style = [];
 
-  chart.data.datasets[0].pointRadius = stats.map(s =>
-    s.value === 100 || top3Names.includes(s.name) ? 7 : 4
-  );
+  data.forEach((_, i) => {
+    if (i < 3) {
+      radius.push(7);
+      bg.push("#FFD700");
+      border.push("#B8860B");
+      style.push("star");
+    } else {
+      radius.push(4);
+      bg.push("#3b4f6b");
+      border.push("#3b4f6b");
+      style.push("circle");
+    }
+  });
 
-  chart.data.datasets[0].pointBackgroundColor = stats.map(s =>
-    s.value === 100 || top3Names.includes(s.name) ? "#FFD700" : "#3b4f6b"
-  );
-
-  chart.data.datasets[0].pointStyle = stats.map(s =>
-    s.value === 100 || top3Names.includes(s.name) ? "star" : "circle"
-  );
+  radarChart.data.datasets[0].data = data.map(d => d.value);
+  radarChart.data.datasets[0].pointRadius = radius;
+  radarChart.data.datasets[0].pointBackgroundColor = bg;
+  radarChart.data.datasets[0].pointBorderColor = border;
+  radarChart.data.datasets[0].pointStyle = style;
 
   sliders.forEach(s => s.nextSibling.textContent = s.value);
-  chart.update();
+  radarChart.update();
 }
 
 // Events
 sliders.forEach(s => s.addEventListener("input", updateChart));
-nameInputs.forEach(n => n.addEventListener("input", updateChart));
+statInputs.forEach(i => i.addEventListener("input", updateChart));
 
+// Buttons
+const resetBtn = document.createElement("button");
+resetBtn.className = "btn";
+resetBtn.textContent = "Reset";
+resetBtn.onclick = () => {
+  sliders.forEach(s => s.value = 0);
+  updateChart();
+};
+
+const randomBtn = document.createElement("button");
+randomBtn.className = "btn";
+randomBtn.textContent = "Randomize";
+randomBtn.onclick = () => {
+  sliders.forEach(s => s.value = Math.floor(Math.random() * 21) * 5);
+  updateChart();
+};
+
+statsPanel.append(resetBtn, randomBtn);
 updateChart();
 </script>
 
