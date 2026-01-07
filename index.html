@@ -192,10 +192,7 @@ const radarChart = new Chart(document.getElementById("radar"), {
     }]
   },
   options: {
-    animation: {
-      duration: 600,
-      easing: "easeInOutQuart"
-    },
+    animation: { duration: 600, easing: "easeInOutQuart" },
     plugins: { legend: { display: false } },
     scales: {
       r: {
@@ -206,11 +203,11 @@ const radarChart = new Chart(document.getElementById("radar"), {
         angleLines: { color: "#5a6b8b" },
         pointLabels: {
           font: ctx => ({
-            size: top3Names.includes(ctx.raw) ? 13 : 11,
-            weight: top3Names.includes(ctx.raw) ? "bold" : "normal"
+            size: top3Names.includes(ctx.raw.replace("★ ","")) ? 13 : 11,
+            weight: top3Names.includes(ctx.raw.replace("★ ","")) ? "bold" : "normal"
           }),
           color: ctx =>
-            top3Names.includes(ctx.raw) ? "#FFD700" : "#1b263b"
+            top3Names.includes(ctx.raw.replace("★ ","")) ? "#FFD700" : "#1b263b"
         }
       }
     }
@@ -221,7 +218,8 @@ const radarChart = new Chart(document.getElementById("radar"), {
       const ctx = chart.ctx;
       const meta = chart.getDatasetMeta(0);
       meta.data.forEach((point, i) => {
-        if (i < 3) {
+        const value = chart.data.datasets[0].data[i];
+        if (value === 100 || i < 3) {
           const pulse = Math.sin(Date.now() / 400) * 2 + 3;
           ctx.save();
           ctx.shadowBlur = pulse * 3;
@@ -255,9 +253,12 @@ function updateChart() {
 
   const radius = [], bg = [], border = [], style = [];
 
-  data.forEach((_, i) => {
-    if (i < 3) {
-      radius.push(7);
+  data.forEach((d, i) => {
+    const isTop3 = i < 3;
+    const isMax = d.value === 100;
+
+    if (isTop3 || isMax) {
+      radius.push(isTop3 ? 7 : 6);
       bg.push("#FFD700");
       border.push("#B8860B");
       style.push("star");
