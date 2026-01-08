@@ -80,6 +80,10 @@ input[type=text], select {
   text-align: right;
 }
 
+.chart {
+  width: 380px;
+}
+
 /* ================= DRAGON ================= */
 
 .dragon-container {
@@ -91,52 +95,49 @@ input[type=text], select {
 .dragon {
   width: 6px;
   height: 6px;
-  transform: scale(4);
+  transform: scale(8);
   image-rendering: pixelated;
 }
 
-/* Admin */
+/* Admin: tiny baby dragon */
 .dragon.admin {
   box-shadow:
-    1px 0 #556b2f, 2px 0 #556b2f,
-    0 1px #556b2f,
+    1px 0 #2f4f4f, 2px 0 #2f4f4f,
+    0 1px #2f4f4f,
     1px 1px #6b8e23, 2px 1px #6b8e23,
-    3px 1px #556b2f,
-    1px 2px #6b8e23, 2px 2px #556b2f;
+    1px 2 #6b8e23, 2px 2px #2f4f4f;
 }
 
-/* Junior */
+/* Junior Engineer: adds small wing */
 .dragon.junior {
   box-shadow:
     1px 0 #2e8b57, 2px 0 #2e8b57, 3px 0 #2e8b57,
     0 1px #2e8b57,
     1px 1px #7fff00, 2px 1px #7fff00,
-    3px 1px #2e8b57, 4px 1px #2e8b57,
-    1px 2px #7fff00, 2px 2px #2e8b57;
+    3px 1px #2e8b57,
+    1px 2px #7fff00, 2px 2px #2e8b57,
+    3px 2px #32cd32;
 }
 
-/* Engineer */
+/* Engineer: adds tail */
 .dragon.engineer {
   box-shadow:
-    1px 0 #228b22, 2px 0 #32cd32, 3px 0 #228b22,
+    1px 0 #228b22, 2px 0 #32cd32, 3px 0 #228b22, 4px 0 #228b22,
     0 1px #228b22,
     1px 1px #7fff00, 2px 1px #ff0000, 3px 1px #7fff00,
-    4px 1px #228b22,
-    1px 2px #32cd32, 2px 2px #228b22;
+    1px 2px #32cd32, 2px 2px #228b22,
+    4px 2px #228b22;
 }
 
-/* Senior Engineer */
+/* Senior Engineer: wings + tail + horns */
 .dragon.senior {
   box-shadow:
-    1px 0 #8b0000, 2px 0 #ff4500, 3px 0 #8b0000,
+    1px 0 #8b0000, 2px 0 #ff4500, 3px 0 #8b0000, 4px 0 #8b0000,
     0 1px #8b0000,
     1px 1px #ff6347, 2px 1px #ffd700, 3px 1px #ff6347,
     4px 1px #8b0000,
-    1px 2px #ff4500, 2px 2px #8b0000;
-}
-
-.chart {
-  width: 380px;
+    1px 2px #ff4500, 2px 2px #8b0000,
+    0 0 #8b0000, 4px 0 #8b0000;
 }
 </style>
 </head>
@@ -164,7 +165,7 @@ input[type=text], select {
     <div>
       <div class="stats" id="statsPanel"></div>
 
-      <!-- DRAGON MOVED HERE -->
+      <!-- Dragon visible under skills -->
       <div class="dragon-container">
         <div id="dragon" class="dragon admin"></div>
       </div>
@@ -248,14 +249,16 @@ const jobRanges = {
   "Senior Engineer": [70,100]
 };
 
+// Update dragon by job
 function updateDragon(job) {
   dragon.className = "dragon";
   if (job === "Admin") dragon.classList.add("admin");
-  if (job === "Junior Engineer") dragon.classList.add("junior");
-  if (job === "Engineer") dragon.classList.add("engineer");
-  if (job === "Senior Engineer") dragon.classList.add("senior");
+  else if (job === "Junior Engineer") dragon.classList.add("junior");
+  else if (job === "Engineer") dragon.classList.add("engineer");
+  else if (job === "Senior Engineer") dragon.classList.add("senior");
 }
 
+// Randomize job stats
 function randomizeJob(job) {
   if (!jobRanges[job]) return;
   const [min,max] = jobRanges[job];
@@ -267,6 +270,7 @@ function randomizeJob(job) {
   update();
 }
 
+// Update chart
 function update() {
   const data = inputs.map((i,idx)=>({name:i.value,value:+sliders[idx].value}));
   data.sort((a,b)=>b.value-a.value);
@@ -276,32 +280,32 @@ function update() {
     ...data.filter(d=>d.value===100).map(d=>d.name)
   ]);
 
-  chart.data.labels = data.map(d =>
-    highlightSet.has(d.name) ? `★ ${d.name}` : d.name
-  );
+  chart.data.labels = data.map(d => d.name);
 
-  chart.data.datasets[0].data = data.map(d=>d.value);
+  chart.data.datasets[0].data = data.map(d => d.value);
   chart.data.datasets[0].pointRadius =
-    data.map(d=>highlightSet.has(d.name)?7:4);
+    data.map(d => highlightSet.has(d.name) ? 7 : 4);
   chart.data.datasets[0].pointBackgroundColor =
-    data.map(d=>highlightSet.has(d.name)?"#FFD700":"#3b4f6b");
+    data.map(d => highlightSet.has(d.name) ? "rgba(255,215,0,0.9)" : "#3b4f6b");
   chart.data.datasets[0].pointBorderColor =
-    data.map(d=>highlightSet.has(d.name)?"#B8860B":"#3b4f6b");
+    data.map(d => highlightSet.has(d.name) ? "#B8860B" : "#3b4f6b");
   chart.data.datasets[0].pointStyle =
-    data.map(d=>highlightSet.has(d.name)?"star":"circle");
+    data.map(d => "circle"); // simple circle for all
 
-  sliders.forEach(s=>s.nextSibling.textContent=s.value);
+  sliders.forEach(s => s.nextSibling.textContent = s.value);
   chart.update();
 }
 
+// Events
 sliders.forEach(s=>s.addEventListener("input",update));
 inputs.forEach(i=>i.addEventListener("input",update));
-jobSelect.addEventListener("change",()=>{
+jobSelect.addEventListener("change", ()=>{
   randomizeJob(jobSelect.value);
   updateDragon(jobSelect.value);
 });
 
 update();
+updateDragon("Admin");
 </script>
 
 </body>
