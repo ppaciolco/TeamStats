@@ -31,90 +31,10 @@ body {
   margin-bottom: 10px;
 }
 
-/* ================= DRAGON ================= */
-
-.dragon-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.dragon {
-  width: 6px;
-  height: 6px;
-  transform: scale(3);
-  image-rendering: pixelated;
-}
-
-/* Admin */
-.dragon.admin {
-  box-shadow:
-    1px 0 #556b2f,
-    2px 0 #556b2f,
-    0 1px #556b2f,
-    1px 1px #6b8e23,
-    2px 1px #6b8e23,
-    3px 1px #556b2f,
-    1px 2px #6b8e23,
-    2px 2px #556b2f;
-}
-
-/* Junior Engineer */
-.dragon.junior {
-  box-shadow:
-    1px 0 #2e8b57,
-    2px 0 #2e8b57,
-    3px 0 #2e8b57,
-    0 1px #2e8b57,
-    1px 1px #7fff00,
-    2px 1px #7fff00,
-    3px 1px #2e8b57,
-    4px 1px #2e8b57,
-    1px 2px #7fff00,
-    2px 2px #2e8b57,
-    3px 2px #2e8b57;
-}
-
-/* Engineer */
-.dragon.engineer {
-  box-shadow:
-    1px 0 #228b22,
-    2px 0 #32cd32,
-    3px 0 #228b22,
-    0 1px #228b22,
-    1px 1px #7fff00,
-    2px 1px #ff0000,
-    3px 1px #7fff00,
-    4px 1px #228b22,
-    0 2px #228b22,
-    1px 2px #32cd32,
-    2px 2px #228b22,
-    3px 2px #228b22;
-}
-
-/* Senior Engineer */
-.dragon.senior {
-  box-shadow:
-    1px 0 #8b0000,
-    2px 0 #ff4500,
-    3px 0 #8b0000,
-    0 1px #8b0000,
-    1px 1px #ff6347,
-    2px 1px #ffd700,
-    3px 1px #ff6347,
-    4px 1px #8b0000,
-    0 2px #8b0000,
-    1px 2px #ff4500,
-    2px 2px #8b0000,
-    3px 2px #8b0000;
-}
-
-/* ================= UI ================= */
-
 .topbar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   font-size: 12px;
 }
 
@@ -160,20 +80,63 @@ input[type=text], select {
   text-align: right;
 }
 
-.chart {
-  width: 380px;
-  padding: 10px;
+/* ================= DRAGON ================= */
+
+.dragon-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-.btn {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background: #5a6b8b;
-  border-radius: 6px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 10px;
-  margin-right: 5px;
+.dragon {
+  width: 6px;
+  height: 6px;
+  transform: scale(4);
+  image-rendering: pixelated;
+}
+
+/* Admin */
+.dragon.admin {
+  box-shadow:
+    1px 0 #556b2f, 2px 0 #556b2f,
+    0 1px #556b2f,
+    1px 1px #6b8e23, 2px 1px #6b8e23,
+    3px 1px #556b2f,
+    1px 2px #6b8e23, 2px 2px #556b2f;
+}
+
+/* Junior */
+.dragon.junior {
+  box-shadow:
+    1px 0 #2e8b57, 2px 0 #2e8b57, 3px 0 #2e8b57,
+    0 1px #2e8b57,
+    1px 1px #7fff00, 2px 1px #7fff00,
+    3px 1px #2e8b57, 4px 1px #2e8b57,
+    1px 2px #7fff00, 2px 2px #2e8b57;
+}
+
+/* Engineer */
+.dragon.engineer {
+  box-shadow:
+    1px 0 #228b22, 2px 0 #32cd32, 3px 0 #228b22,
+    0 1px #228b22,
+    1px 1px #7fff00, 2px 1px #ff0000, 3px 1px #7fff00,
+    4px 1px #228b22,
+    1px 2px #32cd32, 2px 2px #228b22;
+}
+
+/* Senior Engineer */
+.dragon.senior {
+  box-shadow:
+    1px 0 #8b0000, 2px 0 #ff4500, 3px 0 #8b0000,
+    0 1px #8b0000,
+    1px 1px #ff6347, 2px 1px #ffd700, 3px 1px #ff6347,
+    4px 1px #8b0000,
+    1px 2px #ff4500, 2px 2px #8b0000;
+}
+
+.chart {
+  width: 380px;
 }
 </style>
 </head>
@@ -182,10 +145,6 @@ input[type=text], select {
 
 <div class="window">
   <div class="title">Engineer Stats</div>
-
-  <div class="dragon-container">
-    <div id="dragon" class="dragon admin"></div>
-  </div>
 
   <div class="topbar">
     <div>Name: <input class="nameInput" type="text"></div>
@@ -202,7 +161,15 @@ input[type=text], select {
   </div>
 
   <div class="content">
-    <div class="stats" id="statsPanel"></div>
+    <div>
+      <div class="stats" id="statsPanel"></div>
+
+      <!-- DRAGON MOVED HERE -->
+      <div class="dragon-container">
+        <div id="dragon" class="dragon admin"></div>
+      </div>
+    </div>
+
     <div class="chart">
       <canvas id="radar" width="360" height="360"></canvas>
     </div>
@@ -217,7 +184,7 @@ const dragon = document.getElementById("dragon");
 
 let sliders = [];
 let inputs = [];
-let highlights = new Set();
+let highlightSet = new Set();
 
 // Build stat rows
 statNames.forEach(name => {
@@ -244,17 +211,36 @@ statNames.forEach(name => {
   inputs.push(input);
 });
 
-// Chart
+// Radar chart
 const chart = new Chart(document.getElementById("radar"), {
   type: "radar",
-  data: { labels: [], datasets: [{ data: [], fill: true }] },
+  data: {
+    labels: [],
+    datasets: [{
+      data: [],
+      fill: true,
+      backgroundColor: "rgba(90,107,139,0.35)",
+      borderColor: "#3b4f6b",
+      borderWidth: 2,
+      pointRadius: [],
+      pointBackgroundColor: [],
+      pointBorderColor: [],
+      pointStyle: []
+    }]
+  },
   options: {
     plugins: { legend: { display: false } },
-    scales: { r: { min: 0, max: 100, ticks: { display: false } } }
+    scales: {
+      r: {
+        min: 0,
+        max: 100,
+        ticks: { display: false }
+      }
+    }
   }
 });
 
-// Job stat ranges
+// Job ranges
 const jobRanges = {
   Admin: [10,50],
   "Junior Engineer": [30,70],
@@ -284,12 +270,26 @@ function randomizeJob(job) {
 function update() {
   const data = inputs.map((i,idx)=>({name:i.value,value:+sliders[idx].value}));
   data.sort((a,b)=>b.value-a.value);
-  highlights = new Set([
+
+  highlightSet = new Set([
     ...data.slice(0,3).map(d=>d.name),
     ...data.filter(d=>d.value===100).map(d=>d.name)
   ]);
-  chart.data.labels = data.map(d=>highlights.has(d.name)?`★ ${d.name}`:d.name);
+
+  chart.data.labels = data.map(d =>
+    highlightSet.has(d.name) ? `★ ${d.name}` : d.name
+  );
+
   chart.data.datasets[0].data = data.map(d=>d.value);
+  chart.data.datasets[0].pointRadius =
+    data.map(d=>highlightSet.has(d.name)?7:4);
+  chart.data.datasets[0].pointBackgroundColor =
+    data.map(d=>highlightSet.has(d.name)?"#FFD700":"#3b4f6b");
+  chart.data.datasets[0].pointBorderColor =
+    data.map(d=>highlightSet.has(d.name)?"#B8860B":"#3b4f6b");
+  chart.data.datasets[0].pointStyle =
+    data.map(d=>highlightSet.has(d.name)?"star":"circle");
+
   sliders.forEach(s=>s.nextSibling.textContent=s.value);
   chart.update();
 }
