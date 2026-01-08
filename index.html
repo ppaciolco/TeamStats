@@ -28,13 +28,15 @@ body {
 .title {
   text-align: center;
   font-size: 16px;
-  margin-bottom: 10px;
+  color: #3b4f6b;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px #fff;
 }
 
 .topbar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   font-size: 12px;
 }
 
@@ -47,11 +49,6 @@ input[type=text], select {
   background-color: #e0edf7;
 }
 
-.nameInput {
-  padding: 6px 4px;
-  line-height: 1.4;
-}
-
 .content {
   display: flex;
   gap: 20px;
@@ -62,6 +59,7 @@ input[type=text], select {
   background: #d3e0f0;
   border-radius: 10px;
   padding: 15px;
+  box-shadow: inset 2px 2px 8px rgba(0,0,0,0.15);
 }
 
 .stat-row {
@@ -70,8 +68,13 @@ input[type=text], select {
   margin-bottom: 10px;
 }
 
-.statName {
+.stat-row input.statName {
   width: 100px;
+  margin-right: 10px;
+}
+
+.stat-row input[type=range] {
+  flex: 1;
   margin-right: 10px;
 }
 
@@ -82,62 +85,29 @@ input[type=text], select {
 
 .chart {
   width: 380px;
+  text-align: center;
+  background: #dfe9f4;
+  border: 2px solid #5a6b8b;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ================= DRAGON ================= */
-
-.dragon-container {
-  display: flex;
-  justify-content: center;
+.btn {
   margin-top: 12px;
+  padding: 6px 12px;
+  background: #5a6b8b;
+  border: 2px solid #3b4f6b;
+  border-radius: 6px;
+  color: #f0f5fa;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  margin-right: 5px;
 }
 
-.dragon {
-  width: 6px;
-  height: 6px;
-  transform: scale(8);
-  image-rendering: pixelated;
-}
-
-/* Admin: tiny baby dragon */
-.dragon.admin {
-  box-shadow:
-    1px 0 #2f4f4f, 2px 0 #2f4f4f,
-    0 1px #2f4f4f,
-    1px 1px #6b8e23, 2px 1px #6b8e23,
-    1px 2 #6b8e23, 2px 2px #2f4f4f;
-}
-
-/* Junior Engineer: adds small wing */
-.dragon.junior {
-  box-shadow:
-    1px 0 #2e8b57, 2px 0 #2e8b57, 3px 0 #2e8b57,
-    0 1px #2e8b57,
-    1px 1px #7fff00, 2px 1px #7fff00,
-    3px 1px #2e8b57,
-    1px 2px #7fff00, 2px 2px #2e8b57,
-    3px 2px #32cd32;
-}
-
-/* Engineer: adds tail */
-.dragon.engineer {
-  box-shadow:
-    1px 0 #228b22, 2px 0 #32cd32, 3px 0 #228b22, 4px 0 #228b22,
-    0 1px #228b22,
-    1px 1px #7fff00, 2px 1px #ff0000, 3px 1px #7fff00,
-    1px 2px #32cd32, 2px 2px #228b22,
-    4px 2px #228b22;
-}
-
-/* Senior Engineer: wings + tail + horns */
-.dragon.senior {
-  box-shadow:
-    1px 0 #8b0000, 2px 0 #ff4500, 3px 0 #8b0000, 4px 0 #8b0000,
-    0 1px #8b0000,
-    1px 1px #ff6347, 2px 1px #ffd700, 3px 1px #ff6347,
-    4px 1px #8b0000,
-    1px 2px #ff4500, 2px 2px #8b0000,
-    0 0 #8b0000, 4px 0 #8b0000;
+.btn:hover {
+  background: #3b4f6b;
 }
 </style>
 </head>
@@ -148,29 +118,20 @@ input[type=text], select {
   <div class="title">Engineer Stats</div>
 
   <div class="topbar">
-    <div>Name: <input class="nameInput" type="text"></div>
-    <div>
-      Job:
-      <select id="jobSelect">
+    <div>Name: <input type="text" placeholder="Enter name"></div>
+    <div>Job:
+      <select>
         <option>Custom</option>
         <option>Admin</option>
         <option>Junior Engineer</option>
         <option>Engineer</option>
-        <option>Senior Engineer</option>
+        <option>Senior</option>
       </select>
     </div>
   </div>
 
   <div class="content">
-    <div>
-      <div class="stats" id="statsPanel"></div>
-
-      <!-- Dragon visible under skills -->
-      <div class="dragon-container">
-        <div id="dragon" class="dragon admin"></div>
-      </div>
-    </div>
-
+    <div class="stats" id="statsPanel"></div>
     <div class="chart">
       <canvas id="radar" width="360" height="360"></canvas>
     </div>
@@ -178,21 +139,20 @@ input[type=text], select {
 </div>
 
 <script>
-const statNames = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"];
+const statNamesList = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"];
 const statsPanel = document.getElementById("statsPanel");
-const jobSelect = document.getElementById("jobSelect");
-const dragon = document.getElementById("dragon");
 
 let sliders = [];
-let inputs = [];
-let highlightSet = new Set();
+let statInputs = [];
+let top3Names = [];
 
 // Build stat rows
-statNames.forEach(name => {
+statNamesList.forEach(name => {
   const row = document.createElement("div");
   row.className = "stat-row";
 
   const input = document.createElement("input");
+  input.type = "text";
   input.className = "statName";
   input.value = name;
 
@@ -201,19 +161,21 @@ statNames.forEach(name => {
   slider.min = 0;
   slider.max = 100;
   slider.step = 5;
+  slider.value = 0;
 
   const value = document.createElement("span");
   value.className = "value";
+  value.textContent = "0";
 
   row.append(input, slider, value);
   statsPanel.appendChild(row);
 
   sliders.push(slider);
-  inputs.push(input);
+  statInputs.push(input);
 });
 
 // Radar chart
-const chart = new Chart(document.getElementById("radar"), {
+const radarChart = new Chart(document.getElementById("radar"), {
   type: "radar",
   data: {
     labels: [],
@@ -230,82 +192,116 @@ const chart = new Chart(document.getElementById("radar"), {
     }]
   },
   options: {
+    animation: {
+      duration: 600,
+      easing: "easeInOutQuart"
+    },
     plugins: { legend: { display: false } },
     scales: {
       r: {
         min: 0,
         max: 100,
-        ticks: { display: false }
+        ticks: { display: false },
+        grid: { color: "#5a6b8b" },
+        angleLines: { color: "#5a6b8b" },
+        pointLabels: {
+          font: ctx => ({
+            size: top3Names.includes(ctx.raw) ? 13 : 11,
+            weight: top3Names.includes(ctx.raw) ? "bold" : "normal"
+          }),
+          color: ctx =>
+            top3Names.includes(ctx.raw) ? "#FFD700" : "#1b263b"
+        }
       }
     }
-  }
+  },
+  plugins: [{
+    id: "goldGlow",
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      const meta = chart.getDatasetMeta(0);
+      meta.data.forEach((point, i) => {
+        if (i < 3) {
+          const pulse = Math.sin(Date.now() / 400) * 2 + 3;
+          ctx.save();
+          ctx.shadowBlur = pulse * 3;
+          ctx.shadowColor = "#FFD700";
+          ctx.beginPath();
+          ctx.arc(point.x, point.y,
+            chart.data.datasets[0].pointRadius[i],
+            0, Math.PI * 2);
+          ctx.fillStyle = chart.data.datasets[0].pointBackgroundColor[i];
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+  }]
 });
 
-// Job ranges
-const jobRanges = {
-  Admin: [10,50],
-  "Junior Engineer": [30,70],
-  Engineer: [50,85],
-  "Senior Engineer": [70,100]
-};
+// Update logic
+function updateChart() {
+  const data = statInputs.map((input, i) => ({
+    name: input.value,
+    value: Number(sliders[i].value)
+  }));
 
-// Update dragon by job
-function updateDragon(job) {
-  dragon.className = "dragon";
-  if (job === "Admin") dragon.classList.add("admin");
-  else if (job === "Junior Engineer") dragon.classList.add("junior");
-  else if (job === "Engineer") dragon.classList.add("engineer");
-  else if (job === "Senior Engineer") dragon.classList.add("senior");
-}
+  data.sort((a, b) => b.value - a.value);
+  top3Names = data.slice(0, 3).map(d => d.name);
 
-// Randomize job stats
-function randomizeJob(job) {
-  if (!jobRanges[job]) return;
-  const [min,max] = jobRanges[job];
-  sliders.forEach(s=>{
-    const steps=[];
-    for(let i=min;i<=max;i+=5) steps.push(i);
-    s.value = steps[Math.floor(Math.random()*steps.length)];
+  radarChart.data.labels = data.map((d, i) =>
+    i < 3 ? `★ ${d.name}` : d.name
+  );
+
+  const radius = [], bg = [], border = [], style = [];
+
+  data.forEach((_, i) => {
+    if (i < 3) {
+      radius.push(7);
+      bg.push("#FFD700");
+      border.push("#B8860B");
+      style.push("star");
+    } else {
+      radius.push(4);
+      bg.push("#3b4f6b");
+      border.push("#3b4f6b");
+      style.push("circle");
+    }
   });
-  update();
-}
 
-// Update chart
-function update() {
-  const data = inputs.map((i,idx)=>({name:i.value,value:+sliders[idx].value}));
-  data.sort((a,b)=>b.value-a.value);
-
-  highlightSet = new Set([
-    ...data.slice(0,3).map(d=>d.name),
-    ...data.filter(d=>d.value===100).map(d=>d.name)
-  ]);
-
-  chart.data.labels = data.map(d => d.name);
-
-  chart.data.datasets[0].data = data.map(d => d.value);
-  chart.data.datasets[0].pointRadius =
-    data.map(d => highlightSet.has(d.name) ? 7 : 4);
-  chart.data.datasets[0].pointBackgroundColor =
-    data.map(d => highlightSet.has(d.name) ? "rgba(255,215,0,0.9)" : "#3b4f6b");
-  chart.data.datasets[0].pointBorderColor =
-    data.map(d => highlightSet.has(d.name) ? "#B8860B" : "#3b4f6b");
-  chart.data.datasets[0].pointStyle =
-    data.map(d => "circle"); // simple circle for all
+  radarChart.data.datasets[0].data = data.map(d => d.value);
+  radarChart.data.datasets[0].pointRadius = radius;
+  radarChart.data.datasets[0].pointBackgroundColor = bg;
+  radarChart.data.datasets[0].pointBorderColor = border;
+  radarChart.data.datasets[0].pointStyle = style;
 
   sliders.forEach(s => s.nextSibling.textContent = s.value);
-  chart.update();
+  radarChart.update();
 }
 
 // Events
-sliders.forEach(s=>s.addEventListener("input",update));
-inputs.forEach(i=>i.addEventListener("input",update));
-jobSelect.addEventListener("change", ()=>{
-  randomizeJob(jobSelect.value);
-  updateDragon(jobSelect.value);
-});
+sliders.forEach(s => s.addEventListener("input", updateChart));
+statInputs.forEach(i => i.addEventListener("input", updateChart));
 
-update();
-updateDragon("Admin");
+// Buttons
+const resetBtn = document.createElement("button");
+resetBtn.className = "btn";
+resetBtn.textContent = "Reset";
+resetBtn.onclick = () => {
+  sliders.forEach(s => s.value = 0);
+  updateChart();
+};
+
+const randomBtn = document.createElement("button");
+randomBtn.className = "btn";
+randomBtn.textContent = "Randomize";
+randomBtn.onclick = () => {
+  sliders.forEach(s => s.value = Math.floor(Math.random() * 21) * 5);
+  updateChart();
+};
+
+statsPanel.append(resetBtn, randomBtn);
+updateChart();
 </script>
 
 </body>
