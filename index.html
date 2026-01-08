@@ -49,6 +49,12 @@ input[type=text], select {
   background-color: #e0edf7;
 }
 
+.nameInput {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  line-height: 1.4;
+}
+
 .content {
   display: flex;
   gap: 20px;
@@ -118,14 +124,14 @@ input[type=text], select {
   <div class="title">Engineer Stats</div>
 
   <div class="topbar">
-    <div>Name: <input type="text" placeholder="Enter name"></div>
+    <div>Name: <input type="text" class="nameInput" placeholder="Enter name"></div>
     <div>Job:
-      <select>
+      <select id="jobSelect">
         <option>Custom</option>
         <option>Admin</option>
         <option>Junior Engineer</option>
         <option>Engineer</option>
-        <option>Senior</option>
+        <option>Senior Engineer</option>
       </select>
     </div>
   </div>
@@ -141,10 +147,11 @@ input[type=text], select {
 <script>
 const statNamesList = ["Cx Reg","2-way","WhatsApp","Acc Setup","Voice","LINE"];
 const statsPanel = document.getElementById("statsPanel");
+const jobSelect = document.getElementById("jobSelect");
 
 let sliders = [];
 let statInputs = [];
-let top3Names = [];
+let highlightNames = new Set();
 
 // Build stat rows
 statNamesList.forEach(name => {
@@ -177,40 +184,20 @@ statNamesList.forEach(name => {
 // Radar chart
 const radarChart = new Chart(document.getElementById("radar"), {
   type: "radar",
-  data: {
-    labels: [],
-    datasets: [{
-      data: [],
-      fill: true,
-      backgroundColor: "rgba(90,107,139,0.35)",
-      borderColor: "#3b4f6b",
-      borderWidth: 2,
-      pointRadius: [],
-      pointBackgroundColor: [],
-      pointBorderColor: [],
-      pointStyle: []
-    }]
-  },
+  data: { labels: [], datasets: [{ data: [], fill: true, backgroundColor: "rgba(90,107,139,0.35)", borderColor: "#3b4f6b", borderWidth: 2, pointRadius: [], pointBackgroundColor: [], pointBorderColor: [], pointStyle: [] }] },
   options: {
-    animation: {
-      duration: 600,
-      easing: "easeInOutQuart"
-    },
     plugins: { legend: { display: false } },
     scales: {
       r: {
         min: 0,
         max: 100,
         ticks: { display: false },
-        grid: { color: "#5a6b8b" },
-        angleLines: { color: "#5a6b8b" },
         pointLabels: {
           font: ctx => ({
-            size: top3Names.includes(ctx.raw) ? 13 : 11,
-            weight: top3Names.includes(ctx.raw) ? "bold" : "normal"
+            size: highlightNames.has(ctx.raw.replace("★ ","")) ? 13 : 11,
+            weight: highlightNames.has(ctx.raw.replace("★ ","")) ? "bold" : "normal"
           }),
-          color: ctx =>
-            top3Names.includes(ctx.raw) ? "#FFD700" : "#1b263b"
+          color: ctx => highlightNames.has(ctx.raw.replace("★ ","")) ? "#FFD700" : "#1b263b"
         }
       }
     }
@@ -219,17 +206,14 @@ const radarChart = new Chart(document.getElementById("radar"), {
     id: "goldGlow",
     afterDraw(chart) {
       const ctx = chart.ctx;
-      const meta = chart.getDatasetMeta(0);
-      meta.data.forEach((point, i) => {
-        if (i < 3) {
-          const pulse = Math.sin(Date.now() / 400) * 2 + 3;
+      chart.getDatasetMeta(0).data.forEach((p,i)=>{
+        if (highlightNames.has(chart.data.labels[i].replace("★ ",""))) {
+          const pulse = Math.sin(Date.now()/400)*2+3;
           ctx.save();
-          ctx.shadowBlur = pulse * 3;
+          ctx.shadowBlur = pulse*3;
           ctx.shadowColor = "#FFD700";
           ctx.beginPath();
-          ctx.arc(point.x, point.y,
-            chart.data.datasets[0].pointRadius[i],
-            0, Math.PI * 2);
+          ctx.arc(p.x,p.y,chart.data.datasets[0].pointRadius[i],0,Math.PI*2);
           ctx.fillStyle = chart.data.datasets[0].pointBackgroundColor[i];
           ctx.fill();
           ctx.restore();
@@ -237,70 +221,61 @@ const radarChart = new Chart(document.getElementById("radar"), {
       });
     }
   }]
-});
+);
+
+// Job-based randomization
+const jobRanges = {
+  "Admin": [10, 50],
+  "Junior Engineer": [30, 70],
+  "Engineer": [50, 85],
+  "Senior Engineer": [70, 100]
+};
+
+function randomizeByJob(job) {
+  if (!jobRanges[job]) return;
+  const [min, max] = jobRanges[job];
+  sliders.forEach(s => {
+    const steps = [];
+    for (let i = min; i <= max; i += 5) steps.push(i);
+    s.value = steps[Math.floor(Math.random() * steps.length)];
+  });
+  updateChart();
+}
 
 // Update logic
 function updateChart() {
-  const data = statInputs.map((input, i) => ({
-    name: input.value,
-    value: Number(sliders[i].value)
-  }));
+  const data = statInputs.map((input,i)=>({name:input.value,value:+sliders[i].value}));
+  data.sort((a,b)=>b.value-a.value);
+  highlightNames = new Set([
+    ...data.slice(0,3).map(d=>d.name),
+    ...data.filter(d=>d.value===100).map(d=>d.name)
+  ]);
 
-  data.sort((a, b) => b.value - a.value);
-  top3Names = data.slice(0, 3).map(d => d.name);
+  radarChart.data.labels = data.map(d=>highlightNames.has(d.name)?`★ ${d.name}`:d.name);
+  radarChart.data.datasets[0].data = data.map(d=>d.value);
+  radarChart.data.datasets[0].pointRadius = data.map(d=>highlightNames.has(d.name)?7:4);
+  radarChart.data.datasets[0].pointBackgroundColor = data.map(d=>highlightNames.has(d.name)?"#FFD700":"#3b4f6b");
+  radarChart.data.datasets[0].pointBorderColor = data.map(d=>highlightNames.has(d.name)?"#B8860B":"#3b4f6b");
+  radarChart.data.datasets[0].pointStyle = data.map(d=>highlightNames.has(d.name)?"star":"circle");
 
-  radarChart.data.labels = data.map((d, i) =>
-    i < 3 ? `★ ${d.name}` : d.name
-  );
-
-  const radius = [], bg = [], border = [], style = [];
-
-  data.forEach((_, i) => {
-    if (i < 3) {
-      radius.push(7);
-      bg.push("#FFD700");
-      border.push("#B8860B");
-      style.push("star");
-    } else {
-      radius.push(4);
-      bg.push("#3b4f6b");
-      border.push("#3b4f6b");
-      style.push("circle");
-    }
-  });
-
-  radarChart.data.datasets[0].data = data.map(d => d.value);
-  radarChart.data.datasets[0].pointRadius = radius;
-  radarChart.data.datasets[0].pointBackgroundColor = bg;
-  radarChart.data.datasets[0].pointBorderColor = border;
-  radarChart.data.datasets[0].pointStyle = style;
-
-  sliders.forEach(s => s.nextSibling.textContent = s.value);
+  sliders.forEach(s=>s.nextSibling.textContent=s.value);
   radarChart.update();
 }
 
 // Events
-sliders.forEach(s => s.addEventListener("input", updateChart));
-statInputs.forEach(i => i.addEventListener("input", updateChart));
+sliders.forEach(s=>s.addEventListener("input",updateChart));
+statInputs.forEach(i=>i.addEventListener("input",updateChart));
+jobSelect.addEventListener("change",()=>randomizeByJob(jobSelect.value));
 
 // Buttons
-const resetBtn = document.createElement("button");
-resetBtn.className = "btn";
-resetBtn.textContent = "Reset";
-resetBtn.onclick = () => {
-  sliders.forEach(s => s.value = 0);
-  updateChart();
-};
+["Reset","Randomize"].forEach(label=>{
+  const b=document.createElement("button");
+  b.className="btn";
+  b.textContent=label;
+  b.onclick=()=>{sliders.forEach(s=>s.value=label==="Reset"?0:Math.floor(Math.random()*21)*5);updateChart();}
+  statsPanel.appendChild(b);
+});
 
-const randomBtn = document.createElement("button");
-randomBtn.className = "btn";
-randomBtn.textContent = "Randomize";
-randomBtn.onclick = () => {
-  sliders.forEach(s => s.value = Math.floor(Math.random() * 21) * 5);
-  updateChart();
-};
-
-statsPanel.append(resetBtn, randomBtn);
 updateChart();
 </script>
 
